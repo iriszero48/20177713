@@ -38,14 +38,14 @@ int main(int argc, char* argv[])
 		{
 			throw gcnew System::Exception("parameter error");
 		}
-		
+
 		auto parameter = gcnew System::Collections::Generic::Dictionary<System::String^, System::String^>();
-	
+
 		for (auto i = 1; i < argc; i += 2)
 		{
 			parameter->Add(gcnew System::String(argv[i]), gcnew System::String(argv[i + 1]));
 		}
-	
+
 		Sudoku sudoku(System::Int32::Parse(parameter["-m"]), System::Int32::Parse(parameter["-n"]));
 		sudoku.InitializeWithFilePath(parameter["-i"]);
 		System::IO::File::WriteAllText(parameter["-o"], Sudoku::ToString(sudoku.Solve()));
@@ -177,4 +177,3 @@ int main(int argc, char* argv[])
 	//system("pause");
 #endif
 }
-
