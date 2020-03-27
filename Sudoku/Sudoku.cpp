@@ -3,7 +3,7 @@
 
 static int M = 0;
 
-ref class Func
+ref class Func sealed
 {
 public:
 	static array<array<int>^>^ ChunkBySize(array<int>^ arr)
@@ -28,7 +28,7 @@ void Sudoku::InitializeWithFilePath(System::String^ path)
 {
 	using namespace Microsoft::FSharp::Core;
 	using ArrayModule = Microsoft::FSharp::Collections::ArrayModule;
-	auto mapSp = gcnew array<System::String^>(1) { " " };
+	const auto mapSp = gcnew array<System::String^>(1) { " " };
 
 	M = m;
 	maps =
@@ -44,24 +44,24 @@ void Sudoku::InitializeWithFilePath(System::String^ path)
 							->Replace("\n", " ")
 							->Replace("\r", " ")
 							->Split(mapSp, System::StringSplitOptions::RemoveEmptyEntries)))));
-	if (maps->Length != n)
+if (maps->Length != n)
+{
+	throw gcnew System::Exception("N size no matches");
+}
+for (auto i = 0; i < maps->Length; ++i)
+{
+	if (maps[i]->Length != m)
 	{
-		throw gcnew System::Exception("N size no matches");
+		throw gcnew System::Exception("M size no matches");
 	}
-	for (auto i = 0; i < maps->Length; ++i)
+	for (auto j = 0; j < m; ++j)
 	{
-		if (maps[i]->Length != m)
+		if (maps[i][j]->Length != m)
 		{
 			throw gcnew System::Exception("M size no matches");
 		}
-		for (int j = 0; j < m; ++j)
-		{
-			if (maps[i][j]->Length != m)
-			{
-				throw gcnew System::Exception("M size no matches");
-			}
-		}
 	}
+}
 }
 
 void Sudoku::InitializeWithArray(Maps^ maps)
@@ -73,26 +73,31 @@ Sudoku::Maps^ Sudoku::Solve()
 {
 	using namespace Microsoft::SolverFoundation::Solvers;
 
+	// 创建一个三维数组存放结果
 	auto res = gcnew Maps(maps->Length);
 	for (auto i = 0; i < maps->Length; ++i)
 	{
 		res[i] = gcnew Map(maps[i]->Length);
-		for (int j = 0; j < maps[i]->Length; ++j)
+		for (auto j = 0; j < maps[i]->Length; ++j)
 		{
 			res[i][j] = gcnew array<int>(maps[i][j]->Length);
 		}
 	}
 
-	#pragma omp parallel for schedule(dynamic, 2)
-	for (int i = 0; i < maps->Length; ++i)
+	// 并行遍历每个盘面，同时调度两个线程
+	// #pragma omp parallel for schedule(dynamic, 2)
+	for (auto i = 0; i < maps->Length; ++i)
 	{
+		// 初始化
 		auto map = maps[i];
 		auto s = ConstraintSystem::CreateSolver();
-		auto z = s->CreateIntegerInterval(1, maps[i]->Length);
+		const auto z = s->CreateIntegerInterval(1, maps[i]->Length);
 		auto lp = s->CreateVariableArray(z, "n", maps[i]->Length, maps[i]->Length);
-		for (int row = 0; row < maps[i]->Length; ++row)
+
+		// 为每行和已知条件添加约束
+		for (auto row = 0; row < maps[i]->Length; ++row)
 		{
-			for (int col = 0; col < maps[i]->Length; ++col)
+			for (auto col = 0; col < maps[i]->Length; ++col)
 			{
 				if (map[row][col] > 0)
 				{
@@ -101,14 +106,16 @@ Sudoku::Maps^ Sudoku::Solve()
 			}
 			s->AddConstraints(s->Unequal(GetSlice(lp, maps[i]->Length, row, row, 0, maps[i]->Length - 1)));
 		}
-		for (int col = 0; col < maps[i]->Length; ++col)
+		
+		// 为每列添加约束
+		for (auto col = 0; col < maps[i]->Length; ++col)
 		{
 			s->AddConstraints(s->Unequal(GetSlice(lp, maps[i]->Length, 0, maps[i]->Length - 1, col, col)));
 		}
 
+		// 为不同盘面阶数设置宫格大小
 		auto stepRow = 0;
 		auto stepCol = 0;
-		
 		switch (maps[i]->Length)
 		{
 		case 4:
@@ -130,11 +137,12 @@ Sudoku::Maps^ Sudoku::Solve()
 		default:;
 		}
 
+		// 如果当前盘面阶数存在宫格，则为每个宫格添加约束
 		if (stepRow != 0 && stepCol != 0)
 		{
-			for (int row = 0; row < maps[i]->Length; row += stepRow)
+			for (auto row = 0; row < maps[i]->Length; row += stepRow)
 			{
-				for (int col = 0; col < maps[i]->Length; col += stepCol)
+				for (auto col = 0; col < maps[i]->Length; col += stepCol)
 				{
 					s->AddConstraints(
 						s->Unequal(
@@ -142,18 +150,20 @@ Sudoku::Maps^ Sudoku::Solve()
 				}
 			}
 		}
+
+		// 求解
 		auto sol = s->Solve();
 		try
 		{
-			for (int row = 0; row < maps[i]->Length; ++row)
+			for (auto row = 0; row < maps[i]->Length; ++row)
 			{
-				for (int col = 0; col < maps[i]->Length; ++col)
+				for (auto col = 0; col < maps[i]->Length; ++col)
 				{
 					res[i][row][col] = sol->GetIntegerValue(lp[row][col]);
 				}
 			}
 		}
-		catch (System::Exception^)
+		catch (System::Exception^) // 无解情况返回nullptr
 		{
 			res[i] = nullptr;
 		}
@@ -201,9 +211,9 @@ array<Sudoku::CspTerm^>^ Sudoku::GetSlice(
 {
 	auto slice = gcnew array<CspTerm^>(m);
 	auto i = 0;
-	for (int row = ra; row <= rb; ++row)
+	for (auto row = ra; row <= rb; ++row)
 	{
-		for (int col = ca; col <= cb; ++col)
+		for (auto col = ca; col <= cb; ++col)
 		{
 			slice[i++] = lp[row][col];
 		}

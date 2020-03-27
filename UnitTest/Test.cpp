@@ -3,7 +3,7 @@ using namespace Microsoft::VisualStudio::TestTools::UnitTesting;
 #include <vector>
 
 [TestClass]
-public ref class SudokuTests
+public ref class SudokuTests sealed
 {
 	using Row = array<int>;
 	using Map = array<Row^>;
@@ -15,14 +15,14 @@ public ref class SudokuTests
 	
 	static Maps^ ToMaps(const Maps_& maps)
 	{
-		auto res = gcnew Maps(maps.size());
-		for (int i = 0; i < maps.size(); ++i)
+		auto res = gcnew Maps(static_cast<int>(maps.size()));
+		for (size_t i = 0; i < maps.size(); ++i)
 		{
-			res[i] = gcnew Map(maps[i].size());
-			for (int j = 0; j < maps[i].size(); ++j)
+			res[i] = gcnew Map(static_cast<int>(maps[i].size()));
+			for (size_t j = 0; j < maps[i].size(); ++j)
 			{
-				res[i][j] = gcnew Row(maps[i][j].size());
-				for (int k = 0; k < maps[i][j].size(); ++k)
+				res[i][j] = gcnew Row(static_cast<int>(maps[i][j].size()));
+				for (size_t k = 0; k < maps[i][j].size(); ++k)
 				{
 					res[i][j][k] = maps[i][j][k];
 				}
@@ -32,9 +32,9 @@ public ref class SudokuTests
 	}
 public:
 	[TestMethod]
-	void Sudoku3x3()
+	void Sudoku3X3()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
 			{
 				{ 2,0,0 },
@@ -69,9 +69,9 @@ Unsolvable!
 	}
 
 	[TestMethod]
-	void Sudoku4x4()
+	void Sudoku4X4()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
 			{
 				{ 0,0, 2,0 },
@@ -114,9 +114,9 @@ Unsolvable!
 	}
 
 	[TestMethod]
-	void Sudoku5x5()
+	void Sudoku5X5()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
 			{
 				{ 0,1,0,0,0 },
@@ -161,9 +161,9 @@ Unsolvable!
 	}
 
 	[TestMethod]
-	void Sudoku6x6()
+	void Sudoku6X6()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
 			{
 				{ 5,0,0, 0,4,0 },
@@ -219,37 +219,37 @@ Unsolvable!
 	}
 
 	[TestMethod]
-	void Sudoku7x7()
+	void Sudoku7X7()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
-			{
-				{ 1,0,0,0,0,0,0 },
-				{ 0,0,2,0,0,0,0 },
-				{ 0,0,0,0,0,5,0 },
-				{ 0,3,0,4,0,0,0 },
-				{ 0,0,0,0,0,0,0 },
-				{ 0,0,0,0,0,6,0 },
-				{ 0,0,0,0,0,0,7 }
-			},
-			{
-				{ 1,0,0,0,6,0,5 },
-				{ 6,2,0,3,0,1,0 },
-				{ 0,4,0,0,0,0,0 },
-				{ 0,6,5,0,0,2,0 },
-				{ 5,0,1,0,4,0,7 },
-				{ 7,0,0,0,0,0,2 },
-				{ 0,0,6,0,0,0,0 }
-			},
-			{
-				{ 1,1,0,0,0,0,0 },
-				{ 0,0,0,0,0,0,0 },
-				{ 0,0,0,0,0,0,0 },
-				{ 0,0,0,0,0,0,0 },
-				{ 0,0,0,0,0,0,0 },
-				{ 0,0,0,0,0,0,0 },
-				{ 0,0,0,0,0,0,0 }
-			}
+				{
+					{ 1,0,0,0,0,0,0 },
+					{ 0,0,2,0,0,0,0 },
+					{ 0,0,0,0,0,5,0 },
+					{ 0,3,0,4,0,0,0 },
+					{ 0,0,0,0,0,0,0 },
+					{ 0,0,0,0,0,6,0 },
+					{ 0,0,0,0,0,0,7 }
+				},
+				{
+					{ 1,0,0,0,6,0,5 },
+					{ 6,2,0,3,0,1,0 },
+					{ 0,4,0,0,0,0,0 },
+					{ 0,6,5,0,0,2,0 },
+					{ 5,0,1,0,4,0,7 },
+					{ 7,0,0,0,0,0,2 },
+					{ 0,0,6,0,0,0,0 }
+				},
+				{
+					{ 1,1,0,0,0,0,0 },
+					{ 0,0,0,0,0,0,0 },
+					{ 0,0,0,0,0,0,0 },
+					{ 0,0,0,0,0,0,0 },
+					{ 0,0,0,0,0,0,0 },
+					{ 0,0,0,0,0,0,0 },
+					{ 0,0,0,0,0,0,0 }
+				}
 		};
 
 		auto s = gcnew Sudoku(7, 3);
@@ -276,9 +276,9 @@ Unsolvable!
 	}
 
 	[TestMethod]
-	void Sudoku8x8()
+	void Sudoku8X8()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
 			{
 				{ 8,0, 0,0, 0,0, 0,0 },
@@ -341,9 +341,9 @@ Unsolvable!
 	}
 	
 	[TestMethod]
-	void Sudoku9x9()
+	void Sudoku9X9()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
 			{
 				{ 0,0,5, 3,0,0, 0,0,0 },
@@ -416,7 +416,7 @@ Unsolvable!
 	[TestMethod]
 	void FileInput()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
 			{
 				{ 0,0,5, 3,0,0, 0,0,0 },
@@ -506,7 +506,7 @@ Unsolvable!
 	[TestMethod]
 	void NSizeNoMatch()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
 			{
 				{ 0,0,5, 3,0,0, 0,0,0 },
@@ -540,7 +540,7 @@ Unsolvable!
 	[TestMethod]
 	void MSizeNoMatch()
 	{
-		Maps_ mp
+		const Maps_ mp
 		{
 			{
 				{ 0,0,5, 3,0,0, 0,0,0 },

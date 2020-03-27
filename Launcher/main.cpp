@@ -12,13 +12,13 @@ using Maps_ = std::vector<Map_>;
 
 static Maps^ ToMaps(const Maps_& maps)
 {
-	auto res = gcnew Maps(maps.size());
+	auto res = gcnew Maps(static_cast<int>(maps.size()));
 	for (auto i = 0; i < maps.size(); ++i)
 	{
-		res[i] = gcnew Map(maps[i].size());
+		res[i] = gcnew Map(static_cast<int>(maps[i].size()));
 		for (auto j = 0; j < maps[i].size(); ++j)
 		{
-			res[i][j] = gcnew Row(maps[i][j].size());
+			res[i][j] = gcnew Row(static_cast<int>(maps[i][j].size()));
 			for (auto k = 0; k < maps[i][j].size(); ++k)
 			{
 				res[i][j][k] = maps[i][j][k];
@@ -28,7 +28,7 @@ static Maps^ ToMaps(const Maps_& maps)
 	return res;
 }
 
-int main(int argc, char* argv[])
+int main(const int argc, char* argv[])
 {
 //#define Debug
 #ifndef Debug
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 	{
 		fprintf(stderr, "Usage:\n  %s -m 宫格阶级 -n 待解答盘面数目 -i 指定输入文件 -o 指定程序的输出文件\n", argv[0]);
 		System::Console::Error->WriteLine(exception->ToString());
-		return 0;
+		return EXIT_FAILURE;
 	}
 #else
 	Sudoku sudoku(9, 1);
