@@ -82,7 +82,8 @@ Sudoku::Maps^ Sudoku::Solve()
 			res[i][j] = gcnew array<int>(maps[i][j]->Length);
 		}
 	}
-	
+
+	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < maps->Length; ++i)
 	{
 		auto map = maps[i];
