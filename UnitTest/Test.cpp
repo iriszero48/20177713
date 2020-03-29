@@ -15,6 +15,7 @@ public ref class SudokuTests sealed
 	
 	static Maps^ ToMaps(const Maps_& maps)
 	{
+#pragma warning(disable:4267)
 		auto res = gcnew Maps(static_cast<int>(maps.size()));
 		for (size_t i = 0; i < maps.size(); ++i)
 		{
