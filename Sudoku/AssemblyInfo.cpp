@@ -1,4 +1,6 @@
-﻿#include "pch.h"
+﻿// ReSharper disable CppRedundantQualifier
+// ReSharper disable CppRedundantEmptyDeclaration
+#include "pch.h"
 
 using namespace System;
 using namespace System::Reflection;

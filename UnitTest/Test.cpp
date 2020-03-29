@@ -9,8 +9,11 @@ public ref class SudokuTests sealed
 	using Map = array<Row^>;
 	using Maps = array<Map^>;
 
+	// ReSharper disable once CppInconsistentNaming
 	using Row_ = std::vector<int>;
+	// ReSharper disable once CppInconsistentNaming
 	using Map_ = std::vector<Row_>;
+	// ReSharper disable once CppInconsistentNaming
 	using Maps_ = std::vector<Map_>;
 	
 	static Maps^ ToMaps(const Maps_& maps)
